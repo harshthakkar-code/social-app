@@ -1,0 +1,47 @@
+/* .postcontainer {} */
+
+.subpostcointainer {
+    width: 93%;
+    background-color: white;
+    margin-top: 20px;
+    margin-left: 20px;
+    border-radius: 10px;
+}
+.postimg{
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    margin-left: 10px;
+}
+.postimgs{
+    width: 450px;
+    height: 450px;
+    object-fit: contain;
+    border-radius: 10px;
+}
+.iconforpost{
+    width: 20px;
+}
+.optionicon{
+    width: 15px;
+    height: 25px;
+    object-fit: contain;
+}
+.commentinput{
+    width: 24pc;
+    margin-left: 10px;
+    border: none;
+    /* height: 6vh; */
+
+}
+.addcommentbtn{
+    padding: 10px;
+    border: none;
+    background-color: black;
+    color: white;
+    border-radius: 6px;
+    margin-left: 10px;
+    cursor: pointer;
+    padding-left: 40px;
+    padding-right: 40px;
+}

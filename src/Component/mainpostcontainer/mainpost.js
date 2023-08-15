@@ -1,10 +1,14 @@
 import React from 'react';
 import "./mainpost.css";
+import Contentpost from '../contentPostCointainer/contentPost';
+import Postcointainer from '../postcointainer/post';
 
-export default function mainpost(){
+export default function Mainpost(){
  return (
-    <div>
-      Mainpost
+    <div className='mainpostcontainer'>
+      <Contentpost/>
+      <Postcointainer/>
+      <Postcointainer/>
     </div>
  )   
 }

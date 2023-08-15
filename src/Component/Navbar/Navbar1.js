@@ -4,6 +4,7 @@ import massage from "../image/massage.png";
 import profile from "../image/profile.png";
 // import massage from "../image/massage.png";
 import "./Navbar.css";
+import { Link } from "react-router-dom";
 
 const Navbar1 = () =>{
     return(
@@ -21,10 +22,12 @@ const Navbar1 = () =>{
         <div className="IconsContainer ">
               <img src={`${notification}`} className='Icons  ' alt=''/>
               <img src={`${massage}`} className='Icons' alt=''/>
+              <Link to={"/profile/8765456789"}>
               <div style={{display:'flax',alignItems:'center'}}>
                  <img src={`${profile}`} className='ProfileImage' alt=''/>
-                 {/* <p style={{marginLeft:'10px'}}>suman</p> */}
+                 <p style={{marginLeft:'px5'}}>suman</p>
               </div>
+              </Link>
         </div>
      </div>
     )
