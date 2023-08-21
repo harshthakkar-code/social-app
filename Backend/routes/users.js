@@ -16,7 +16,7 @@ router.post("/create/user",
   async (req, res) => {
     const error = validationResult(req);
     if (!error.isEmpty()) {
-      console.log('in catch', error)
+      console.log('in catch', req.body)
       return res.status(400).json("some error occured")
     }
     try {
@@ -45,7 +45,7 @@ router.post("/create/user",
       await user.save();
       res.status(200).json({ user, acessToken })
     } catch (error) {
-      console.log('in catch', error)
+      console.log('in catch', req.body)
       return res.status(400).json('internal error occured')
     }
   })
@@ -87,23 +87,30 @@ router.post('/login',
   })
 
 //following
-router.put("/following/:id", verifyToken, async (req, res) => {
-  if (req.params.id !== req.body.user) {
-    const user = await User.findById(req.params.id);
-    const otheruser = await User.findById(req.body.user);
-    
-    if (!user.Followers.includes(req.body.user)) {
-      await user.updateOne({ $push: { Followers: req.body.user } });
-      await otheruser.updateOne({ $push: { following: req.params.id } });
-      return res.status(200).json("User has followed");
-    } else {
-      return res.status(400).json("Your already follow this user")
-    }
-  } else {
-    return res.status(400).json("You can't follow yoursellf")
 
-  }
+router.put("/following/:id" , verifyToken , async(req , res)=>{
+    if(req.params.id !== req.body.user){
+        const user = await User.findById(req.params.id);
+        const otheruser = await User.findById(req.body.user);
+
+        if(!user.Followers.includes(req.body.user)){
+            await user.updateOne({$push:{Followers:req.body.user}});
+            await otheruser.updateOne({$push:{Following:req.params.id}});
+            return res.status(200).json("User has followed");
+        }else{
+            await user.updateOne({$pull:{Followers:req.body.user}});
+            await otheruser.updateOne({$pull:{Following:req.params.id}});
+            return res.status(200).json("User has Unfollowed");
+        }
+    }else{
+        return res.status(400).json("You can't follow yourself")
+    }
 })
+
+// Fetch post for followers
+
+
+
 
 module.exports = router;
 
