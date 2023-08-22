@@ -57,10 +57,10 @@ router.post('/login',
   body('password').isLength({ min: 6 }),
   async (req, res) => {
     const error = validationResult(req);
-    if (!error.isEmpty()) {
-      console.log('in catch', error)
-      return res.status(400).json("some error occured")
-    }
+    // if (!error.isEmpty()) {
+    //   console.log('in catch', error)
+    //   return res.status(400).json("some error occured")
+    // }
 
     try {
       const user = await User.findOne({ email: req.body.email });
@@ -88,29 +88,80 @@ router.post('/login',
 
 //following
 
-router.put("/following/:id" , verifyToken , async(req , res)=>{
-    if(req.params.id !== req.body.user){
-        const user = await User.findById(req.params.id);
-        const otheruser = await User.findById(req.body.user);
+router.put("/following/:id", verifyToken, async (req, res) => {
+  if (req.params.id !== req.body.user) {
+    const user = await User.findById(req.params.id);
+    const otheruser = await User.findById(req.body.user);
 
-        if(!user.Followers.includes(req.body.user)){
-            await user.updateOne({$push:{Followers:req.body.user}});
-            await otheruser.updateOne({$push:{Following:req.params.id}});
-            return res.status(200).json("User has followed");
-        }else{
-            await user.updateOne({$pull:{Followers:req.body.user}});
-            await otheruser.updateOne({$pull:{Following:req.params.id}});
-            return res.status(200).json("User has Unfollowed");
-        }
-    }else{
-        return res.status(400).json("You can't follow yourself")
+    if (!user.Followers.includes(req.body.user)) {
+      await user.updateOne({ $push: { Followers: req.body.user } });
+      await otheruser.updateOne({ $push: { Following: req.params.id } });
+      return res.status(200).json("User has followed");
+    } else {
+      await user.updateOne({ $pull: { Followers: req.body.user } });
+      await otheruser.updateOne({ $pull: { Following: req.params.id } });
+      return res.status(200).json("User has Unfollowed");
     }
+  } else {
+    return res.status(400).json("You can't follow yourself")
+  }
 })
 
 // Fetch post for followers
 
+router.get("/flw/:id", verifyToken, async (req, res) => {
+  try {
+    const user = await User.findById(req.params.id);
+    const followersPost = await Promise.all(
+      user.Following.map((item) => {
+        return Post.find({ user: item })
+      })
+    )
+    res.status(200).json(followersPost);
+  } catch (error) {
+    return res.status(500).json("Internal Server Error")
+  }
+})
+
+// Update user profile
+
+router.put("/update/:id", verifyToken, async (req, res) => {
+  try {
+    if (req.params.id === req.user.id) {
+      if (req.body.password) {
+        const salt = await bcrypt.genSalt(10);
+        const secpass = await bcrypt.hash(req.body.password, salt);
+        req.body.password = secpass;
+        const updateuser = await User.findByIdAndUpdate(req.params.id, {
+          $set: req.body
+        });
+        await updateuser.save();
+        res.status(200).json(updateuser);
+      }
+    } else {
+      return res.status(400).json("Your are not allow to update this user details ")
+    }
+  } catch (error) {
+    return res.status(500).json("Internal server error")
+  }
+
+})
 
 
+// delete user account
+
+router.delete("/delete/:id", verifyToken, async (req, res) => {
+  try {
+    if (req.params.id !== req.user.id) {
+      return res.status(400).json("Account doesn't match")
+    } else {
+      const user = await User.findByIdAndDelete(req.params.id);
+      return res.status(200).json("User account has been deleted")
+    }
+  } catch (error) {
+    return res.status(500).json("Internal server error")
+  }
+})
 
 module.exports = router;
 
